@@ -25,17 +25,13 @@ function withjQuery(callback){
 		script.addEventListener('load', function() { document.head.appendChild(cb);	});
 		document.head.appendChild(script);
 	} else {
-		setTimeout(function() {
-			callback(jQuery, typeof unsafeWindow === "undefined" ? window : unsafeWindow);
-		}, 30);
+		jQuery(function(){setTimeout(function(){callback(jQuery, window)}, 30)});
 	}
 }
 
 withjQuery(function($, window){
 	function route(keyword, fn) {
-		var url = window.location.href;
-		if (typeof(keyword) == "string" && url.indexOf(keyword) != -1)  return fn();
-		if (Object.prototype.toString.call(keyword) == "[object RegExp]" && keyword.test(url)) return fn();
+		if (window.location.href.indexOf(keyword)!= -1)  return fn();
 	}
 
 	route("github", function(){
