@@ -10,36 +10,31 @@
 // @include        https://github.com/*/blame/*
 // @include        http://tieba.baidu.com/p/*
 // @include        http://tieba.baidu.com/f*
-// @require		   https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js
 // ==/UserScript==
 
-function withjQuery(callback){
-	if(typeof(jQuery) == "undefined") {
-		var script = document.createElement("script");
-		script.type = "text/javascript";
-		script.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js";
-
-		var cb = document.createElement("script");
-		cb.type = "text/javascript";
-		cb.textContent = "jQuery.noConflict();(" + callback.toString() + ")(jQuery, window);";
-		script.addEventListener('load', function() { document.head.appendChild(cb);	});
-		document.head.appendChild(script);
-	} else {
-		jQuery(function(){setTimeout(function(){callback(jQuery, window)}, 30)});
-	}
-}
-
-withjQuery(function($, window){
+setTimeout(function(){
 	function route(keyword, fn) {
-		if (window.location.href.indexOf(keyword)!= -1)  return fn();
+		if (window.location.href.indexOf(keyword) !== -1) fn();
 	}
 
-	route("github", function(){
-		if ($("div.container").length) return $("div.container").width("90%");	
+	function $(exp){
+		if (/^#.+$/.test(exp)) return document.getElementById(exp.replace("#",""));
+		if (/^\..+$/.test(exp)) return document.getElementsByClassName(exp.replace(".",""));
+		return null
+	}
+
+	route("github", function(){		
+		var div = $(".container")
+		if (div && div.length >0){
+			for(var i=0; i< div.length; i++){
+				div[i].style.width = screen.width * 0.9 + "px";
+			}
+		}
 	});	
 		
 	route("tieba.baidu.com", function(){
-		if ($("div.l_banner").length) $("div.l_banner").hide();
-		if (PageData.is_sign_in == 0 && Sign_rank && Sign_rank.sign_add) setTimeout(function(){Sign_rank.sign_add()}, 1000);
+		var div = $(".l_banner")
+		if (div && div.length == 1) div[0].style.display = "none";
+		if (window["PageData"] && window["PageData"].is_sign_in == 0 && window["Sign_rank"] && window["Sign_rank"].sign_add) window["Sign_rank"].sign_add();		
 	});
-});
+},300);
