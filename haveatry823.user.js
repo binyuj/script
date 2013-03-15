@@ -31,18 +31,19 @@ function withjQuery(callback){
 	}
 }
 
-withjQuery(function($, window){	
+withjQuery(function($, window){
 	function route(keyword, fn) {
-		if (typeof(keyword) == "string" && window.location.href.indexOf(keyword)!= -1)  return fn();
-		if (keyword.test(window.location.href)) return fn();
+		var url = window.location.href;
+		if (typeof(keyword) == "string" && url.indexOf(keyword) != -1)  return fn();
+		if (Object.prototype.toString.call(keyword) == "[object RegExp]" && keyword.test(url)) return fn();
 	}
 
 	route("github", function(){
-		$("div.container").length) return $("div.container").width("90%");	
-	});
-
+		if ($("div.container").length) return $("div.container").width("90%");	
+	});	
+		
 	route("tieba.baidu.com", function(){
 		if ($("div.l_banner").length) $("div.l_banner").hide();
-		if (PageData.is_sign_in == 0) setTimeout(function(){Sign_rank.sign_add()}, 1000);
+		if (PageData.is_sign_in == 0 && Sign_rank && Sign_rank.sign_add) setTimeout(function(){Sign_rank.sign_add()}, 1000);
 	});
 });
