@@ -10,9 +10,11 @@
 // @include        https://github.com/*/commits/*
 // @include        https://github.com/*/blame/*
 // @include        https://github.com/*/compare/*
+// @include        https://github.com/*/blob/*
 // @include        http://tieba.baidu.com/p/*
 // @include        http://tieba.baidu.com/f*
 // ==/UserScript==
+
 
 
 function route(keyword, fn) {
@@ -28,9 +30,11 @@ route("github", function(win){
 	var div = document.getElementsByClassName("container");
 	if (div && div.length >0){
 		for(var i=0; i< div.length; i++){
-			div[i].style.width = screen.width * 0.9 + "px";
+			div[i].style.width = screen.width * 0.95 + "px";
 		}
 	}
+	var frame = document.getElementsByClassName("frame");
+	if (frame && frame.length) frame[0].style.width = screen.width * 0.95 + "px";
 });
 
 
