@@ -9,6 +9,7 @@
 // @include        https://github.com/*/commit/*
 // @include        https://github.com/*/commits/*
 // @include        https://github.com/*/blame/*
+// @include        https://github.com/*/compare/*
 // @include        http://tieba.baidu.com/p/*
 // @include        http://tieba.baidu.com/f*
 // ==/UserScript==
@@ -30,7 +31,74 @@ route("github", function(win){
 			div[i].style.width = screen.width * 0.9 + "px";
 		}
 	}
-});	
+});
+
+
+route("github", function(win){		
+	var lis = document.getElementsByClassName("js-details-container");
+	
+	var getHash= function (url){
+		var arr = url.toString().split("/commit/");
+		return arr && arr.length == 2 ? arr[1].substring(0, 10) : ""	
+	}
+	var getPath = function (url){
+		var arr = url.toString().split("/");
+		arr.pop();
+		arr[ arr.length -1 ] = "compare";
+		return arr.join("/") + "/";
+	}
+
+	var clickEvent = function(event){
+		var el = event.target;
+		while(el.tagName != "LI"){ 
+			el = el.parentNode;
+		}	
+		var selected = document.getElementsByClassName("cmp_selected");
+		var newcolor = "red", oldcolor = "#333";
+		var link = ((el.getElementsByClassName("commit-title"))[0].getElementsByTagName("a"))[0];
+
+		if (selected.length <= 2){			
+			link.style.color = link.style.color == newcolor  ? oldcolor : newcolor;
+			if (selected.length == 2 && link.style.color == newcolor) {
+				link.style.color = oldcolor;
+				var reg = new RegExp("(\\s|^)cmp_selected(\\s|$)");
+				link.className = link.className.replace(reg, " ");
+			}
+			if (link.style.color == newcolor){
+				link.className += " cmp_selected";
+			}else{
+				var reg = new RegExp("(\\s|^)cmp_selected(\\s|$)");
+				link.className = link.className.replace(reg, " ");
+			}
+		}
+		selected = document.getElementsByClassName("cmp_selected");
+		
+		if (selected && selected.length == 2){
+			var href1 = selected[0].getAttribute("href"), href2 = selected[1].getAttribute("href");
+			var url = getPath(href1) + getHash(href2) + "..." + getHash(href1);
+			document.getElementById("btn_viewcmp").setAttribute("href", url)
+			return;
+		}
+	}
+
+
+	if (lis && lis.length >0){
+		for(var i=0; i< lis.length; i++){
+			lis[i].addEventListener('click', clickEvent, true);
+		}
+		var cmp_button = document.createElement("a");
+		cmp_button.id = "btn_viewcmp";		
+		cmp_button.className = "minibutton";
+		cmp_button.innerHTML = "View comparison";
+		cmp_button.href = "#";
+		cmp_button.style.marginLeft = "100px";
+		cmp_button.target = "_blank";
+		cmp_button.title = "请先点亮两个不同的提交，再点击本按钮来比较这两个提交的内容";
+		var breadcrumb = document.getElementsByClassName("breadcrumb");
+		breadcrumb[0].appendChild(cmp_button);		
+	}
+});
+
 	
 route("tieba.baidu.com", function(){
 	//屏蔽Banner广告
