@@ -33,6 +33,7 @@ route("github", function(win){
 			div[i].style.width = screen.width * 0.95 + "px";
 		}
 	}
+	document.getElementById('js-repo-pjax-container').style.width='1240px';
 	var frame = document.getElementsByClassName("frame");
 	if (frame && frame.length) frame[0].style.width = screen.width * 0.95 + "px";
 });
